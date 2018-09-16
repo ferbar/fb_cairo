@@ -14,31 +14,42 @@
 #include <cairomm/context.h>
 #include <cairomm/cairomm.h>
 
+// https://developer.gnome.org/gtkmm-tutorial/stable/sec-drawing-clock-example.html.en
 bool cairo_clock(const Cairo::RefPtr<Cairo::Context>& cr)
 {
-	const int width = 40;
-	const int height = 40;
+	const int width = 100;
+	const int height = 100;
 	
-	const int m_radius = 18;
-	const int m_line_width=width;
+	const double m_radius = 0.42;
+	const double m_line_width=0.05;
 
+	cr->translate(320-100 -10, 240-100 -10);
+
+	printf("draw clock\n");
 	// scale to unit square and translate (0, 0) to be (0.5, 0.5), i.e.
 	// the center of the window
 	cr->scale(width, height);
 	cr->translate(0.5, 0.5);
 	cr->set_line_width(m_line_width);
 
+
+	/* fill green background
 	cr->save();
 	cr->set_source_rgba(0.337, 0.612, 0.117, 0.9);   // green
 	cr->paint();
 	cr->restore();
+	*/
+	
 	cr->arc(0, 0, m_radius, 0, 2 * M_PI);
+
 	cr->save();
-	cr->set_source_rgba(1.0, 1.0, 1.0, 0.8);
+	cr->set_source_rgba(0.612, 0.337, 0.117, 0.9);   // red
 	cr->fill_preserve();
 	cr->restore();
 	cr->stroke_preserve();
 	cr->clip();
+
+
 
 	//clock ticks
 	for (int i = 0; i < 12; i++)
@@ -61,9 +72,9 @@ bool cairo_clock(const Cairo::RefPtr<Cairo::Context>& cr)
 				m_radius * cos (i * M_PI / 6),
 				m_radius * sin (i * M_PI / 6));
 		cr->stroke();
-		cr->restore(); /* stack-pen-size */
+		cr->restore(); // stack-pen-size
 	}
-
+	
 	// store the current time
 	time_t rawtime;
 	time(&rawtime);
@@ -87,6 +98,7 @@ bool cairo_clock(const Cairo::RefPtr<Cairo::Context>& cr)
 	cr->stroke();
 	cr->restore();
 
+
 	// draw the minutes hand
 	cr->set_source_rgba(0.117, 0.337, 0.612, 0.9);   // blue
 	cr->move_to(0, 0);
@@ -101,6 +113,7 @@ bool cairo_clock(const Cairo::RefPtr<Cairo::Context>& cr)
 			-cos(hours + minutes / 12.0) * (m_radius * 0.5));
 	cr->stroke();
 	cr->restore();
+
 
 	// draw a little dot in the middle
 	cr->arc(0, 0, m_line_width / 3.0, 0, 2 * M_PI);
@@ -165,6 +178,9 @@ int main(int argc, char*argv[]) {
 	cr->show_text(argv[2]);
 	cr->move_to(5, 95);
 	cr->show_text(argv[3]);
+	cr->stroke();
+
+	cairo_clock(cr);
 
 	clock_gettime(CLOCK_MONOTONIC, &tspec);
 	// surface->surface_flush();
